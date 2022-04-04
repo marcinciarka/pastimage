@@ -8,10 +8,9 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   background-color: transparent;
 }
+
 html {
   background: linear-gradient(45deg, #fadfff, #d2f1ff);
-              /* linear-gradient(142deg, transparent, white),
-              linear-gradient(108deg, red, transparent); */
 }
 
 a {

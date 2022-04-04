@@ -1,13 +1,22 @@
 import { useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
-import Image from "next/image";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { Typography } from "@mui/material";
+import { useTheme } from "@mui/system";
+import classNames from "classnames";
+import { v4 as uuidv4 } from "uuid";
+import { PastedImage } from "pages/components";
+import dragAndDropStyles from "styles/components/drag-and-drop.module.scss";
 
 type DragAndDropProps = {
   onImageDrop: (t: string) => void;
-  image?: string;
+  imagesList?: string[];
 };
 
-export const DragAndDrop = ({ onImageDrop, image }: DragAndDropProps) => {
+export const DragAndDrop = ({ onImageDrop, imagesList }: DragAndDropProps) => {
+  const {
+    palette: { text },
+  } = useTheme();
   const onDrop = useCallback(
     (acceptedFiles) => {
       acceptedFiles.forEach((file: File) => {
@@ -22,7 +31,7 @@ export const DragAndDrop = ({ onImageDrop, image }: DragAndDropProps) => {
     },
     [onImageDrop]
   );
-  const { getRootProps, getInputProps } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   useEffect(() => {
     document.addEventListener("paste", (event) => {
@@ -39,22 +48,35 @@ export const DragAndDrop = ({ onImageDrop, image }: DragAndDropProps) => {
         blob && reader.readAsDataURL(blob);
       }
     });
-  });
+  }, [onImageDrop]);
 
   return (
-    <div {...getRootProps()}>
+    <div {...getRootProps()} className={dragAndDropStyles.DragAndDrop}>
       <input {...getInputProps()} />
-      {image ? (
-        <Image
-          src={image}
-          alt="Wklejony obrazek"
-          layout="responsive"
-          width={100}
-          height={100}
-        />
-      ) : (
-        <p>Drag n drop some files here, or click to select files</p>
-      )}
+      <div
+        className={classNames(
+          dragAndDropStyles.NoImage,
+          isDragActive && dragAndDropStyles.DragActive
+        )}
+      >
+        <ContentCopyIcon sx={{ fontSize: 60, fill: text.primary }} />
+        <Typography
+          variant="h5"
+          gutterBottom
+          component="div"
+          color={text.secondary}
+        >
+          Przeciągnij plik na to pole
+        </Typography>
+        <Typography variant="subtitle1" color={text.secondary}>
+          lub
+        </Typography>
+        <Typography variant="h5" color={text.secondary}>
+          wklej prosto ze schowka
+        </Typography>
+      </div>
+      {imagesList &&
+        imagesList.map((image) => <PastedImage key={uuidv4()} src={image} />)}
     </div>
   );
 };

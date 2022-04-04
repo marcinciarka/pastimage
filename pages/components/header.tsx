@@ -15,18 +15,21 @@ export const Header: FC = () => {
         <title>pastimage 🤌 🍝</title>
       </Head>
       <Typography
-        variant="h1"
+        variant="h4"
         component="div"
         gutterBottom
         align="center"
         color={text.primary}
+        sx={{
+          marginTop: 5,
+          marginBottom: 5,
+        }}
       >
         <DinnerDiningIcon
-          style={{
+          sx={{
+            fontSize: 45,
             position: "relative",
-            width: 70,
-            height: 70,
-            marginBottom: -7,
+            marginBottom: -1,
             overflow: "visible",
             fill: text.primary,
           }}

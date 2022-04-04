@@ -1,13 +1,16 @@
 import type { NextPage } from "next";
 import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import { Container } from "./components/container";
-import { Header } from "./components/header";
-import { DragAndDrop } from "./components/drag-and-drop";
-import { useState } from "react";
+import { Container, Header, DragAndDrop } from "pages/components";
+import { useEffect, useState } from "react";
 
 const MainPage: NextPage = () => {
-  const [image, setImage] = useState("");
+  const [imagesList, addImage] = useState<string[]>([]);
+  const updateTempImagesList = (image: string) => {
+    addImage((currentImages) => [image, ...currentImages]);
+  };
+  // useEffect(() => {
+
+  // }, [image]);
   return (
     <Container>
       <Grid container spacing={2}>
@@ -15,9 +18,10 @@ const MainPage: NextPage = () => {
           <Header />
         </Grid>
         <Grid item xs={12}>
-          <Paper>
-            <DragAndDrop onImageDrop={setImage} image={image} />
-          </Paper>
+          <DragAndDrop
+            onImageDrop={updateTempImagesList}
+            imagesList={imagesList}
+          />
         </Grid>
       </Grid>
     </Container>

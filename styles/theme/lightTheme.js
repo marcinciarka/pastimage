@@ -7,6 +7,10 @@ const lightTheme = createTheme({
     mode: 'light',
     background: {
       default: 'transparent'
+    },
+    text: {
+      primary: '#5e7581',
+      secondary: '#a1bcc9',
     }
   },
 });
