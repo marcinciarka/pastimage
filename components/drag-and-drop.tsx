@@ -1,19 +1,16 @@
-import { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { Typography } from "@mui/material";
 import { useTheme } from "@mui/system";
 import classNames from "classnames";
-import { v4 as uuidv4 } from "uuid";
-import { PastedImage } from "pages/components";
 import dragAndDropStyles from "styles/components/drag-and-drop.module.scss";
 
 type DragAndDropProps = {
   onImageDrop: (t: string) => void;
-  imagesList?: string[];
 };
 
-export const DragAndDrop = ({ onImageDrop, imagesList }: DragAndDropProps) => {
+export const DragAndDrop = ({ onImageDrop }: DragAndDropProps) => {
   const {
     palette: { text },
   } = useTheme();
@@ -34,20 +31,19 @@ export const DragAndDrop = ({ onImageDrop, imagesList }: DragAndDropProps) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   useEffect(() => {
-    document.addEventListener("paste", (event) => {
-      var item = event.clipboardData?.items[0];
-
+    const onPaste = (event: ClipboardEvent) => {
+      const item = event.clipboardData?.items[0];
       if (item?.type.indexOf("image") === 0) {
-        var blob = item.getAsFile();
-
-        var reader = new FileReader();
+        const blob = item.getAsFile();
+        const reader = new FileReader();
         reader.onload = () => {
           reader.result && onImageDrop(reader.result as string);
         };
-
         blob && reader.readAsDataURL(blob);
       }
-    });
+    };
+    document.addEventListener("paste", onPaste);
+    return () => document.removeEventListener("paste", onPaste);
   }, [onImageDrop]);
 
   return (
@@ -75,8 +71,6 @@ export const DragAndDrop = ({ onImageDrop, imagesList }: DragAndDropProps) => {
           wklej prosto ze schowka
         </Typography>
       </div>
-      {imagesList &&
-        imagesList.map((image) => <PastedImage key={uuidv4()} src={image} />)}
     </div>
   );
 };

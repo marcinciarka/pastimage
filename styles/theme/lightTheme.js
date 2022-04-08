@@ -11,7 +11,13 @@ const lightTheme = createTheme({
     text: {
       primary: '#5e7581',
       secondary: '#a1bcc9',
-    }
+    },
+    primary: {
+      main: '#7794a1',
+    },
+    secondary: {
+      main: '#d2f1ff',
+    },
   },
 });
 
