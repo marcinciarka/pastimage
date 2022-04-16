@@ -14,19 +14,34 @@ import {
   PastedImage,
   TabPanel,
 } from "components";
-
-type ImageObjectType = {
-  id: string;
-  src: string;
-  uploaded: boolean;
-};
+import { ImageObjectType } from "types/api";
+import { DragAndDropProps } from "types/components";
 
 const MainPage: NextPage = () => {
-  const [imagesList, addImage] = useState<ImageObjectType[]>([]);
-  const [currentTab, setCurrentTab] = useState<number>(0);
-  const updateTempImagesList = (image: string) => {
-    addImage((currentImages) => [
-      { id: uuidv4(), src: image, uploaded: false },
+  const [imagesList, setImageList] = useState<ImageObjectType[]>([]);
+  const [currentTab, setCurrentTab] = useState<number>(1);
+  const onUploadEnd = (uploadedImage: ImageObjectType) => {
+    const { imageId: uploadedImageId } = uploadedImage;
+    const uploadedImageIndex = imagesList.findIndex(
+      ({ imageId }) => imageId === uploadedImageId
+    );
+    if (uploadedImageIndex < 0) {
+      console.error("Wrong image id");
+    }
+    setImageList((currentImages) => {
+      currentImages[uploadedImageIndex] = {
+        ...uploadedImage,
+        uploaded: true,
+      };
+      return [...currentImages];
+    });
+  };
+  const updateImagesList: DragAndDropProps["onImageDrop"] = ({
+    fullImageSrc,
+    name,
+  }) => {
+    setImageList((currentImages) => [
+      { imageId: uuidv4(), fullImageSrc, name, uploaded: false },
       ...currentImages,
     ]);
   };
@@ -43,7 +58,7 @@ const MainPage: NextPage = () => {
           <Header />
         </Grid>
         <Grid item xs={12}>
-          <DragAndDrop onImageDrop={updateTempImagesList} />
+          <DragAndDrop onImageDrop={updateImagesList} />
           <Box sx={{ width: "100%", marginTop: 5 }}>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
               <Tabs value={currentTab} onChange={handleTabChange}>
@@ -62,11 +77,27 @@ const MainPage: NextPage = () => {
                 sx={{ overflow: "visible" }}
               >
                 {imagesList &&
-                  imagesList.map(({ id, src, uploaded }) => (
-                    <ImageListItem key={id} sx={{ textAlign: "center" }}>
-                      <PastedImage src={src} uploaded={uploaded} />
-                    </ImageListItem>
-                  ))}
+                  imagesList.map(
+                    ({
+                      imageId,
+                      fullImageSrc,
+                      thumbnailSrc,
+                      name,
+                      uploaded,
+                    }) => (
+                      <ImageListItem key={imageId} sx={{ textAlign: "center" }}>
+                        <PastedImage
+                          imageId={imageId}
+                          fullImageSrc={
+                            thumbnailSrc ? thumbnailSrc : fullImageSrc
+                          }
+                          name={name}
+                          uploaded={uploaded}
+                          onUploadEnd={onUploadEnd}
+                        />
+                      </ImageListItem>
+                    )
+                  )}
               </ImageList>
             </TabPanel>
           </Box>

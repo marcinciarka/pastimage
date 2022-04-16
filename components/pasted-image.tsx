@@ -1,24 +1,42 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useTheme } from "@mui/system";
 import classNames from "classnames";
 import pastedImageStyles from "styles/components/pasted-image.module.scss";
+import { uploadFile } from "api";
+import { PastedImageProps } from "types/image";
 
-type PastedImageProps = {
-  src: string;
-  uploaded: boolean;
-};
-
-export const PastedImage: FC<PastedImageProps> = ({ src, uploaded }) => {
+export const PastedImage: FC<PastedImageProps> = ({
+  imageId,
+  name,
+  fullImageSrc,
+  uploaded,
+  onUploadEnd,
+}) => {
   const {
     palette: { text },
   } = useTheme();
+  useEffect(() => {
+    if (!uploaded) {
+      uploadFile({
+        imageId,
+        fullImageSrc,
+        name,
+      }).then((uploadResponse) => {
+        if (uploadResponse.data.error) {
+          console.error(uploadResponse.data.error);
+          return;
+        }
+        onUploadEnd(uploadResponse.data.imageData);
+      });
+    }
+  }, [uploaded, fullImageSrc, name, onUploadEnd, imageId]);
   return (
     <div className={pastedImageStyles.PastedImageWrapper}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={src}
-        alt="Wklejony obrazek"
+        src={fullImageSrc}
+        alt={`Obrazek - ${name}`}
         className={classNames(
           uploaded
             ? pastedImageStyles.ImageInactive

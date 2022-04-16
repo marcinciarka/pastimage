@@ -4,11 +4,9 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { Typography } from "@mui/material";
 import { useTheme } from "@mui/system";
 import classNames from "classnames";
+import { v4 as uuidv4 } from "uuid";
 import dragAndDropStyles from "styles/components/drag-and-drop.module.scss";
-
-type DragAndDropProps = {
-  onImageDrop: (t: string) => void;
-};
+import { DragAndDropProps } from "types/components";
 
 export const DragAndDrop = ({ onImageDrop }: DragAndDropProps) => {
   const {
@@ -21,7 +19,11 @@ export const DragAndDrop = ({ onImageDrop }: DragAndDropProps) => {
         reader.onabort = () => console.log("file reading was aborted");
         reader.onerror = () => console.log("file reading has failed");
         reader.onload = () => {
-          reader.result && onImageDrop(reader.result as string);
+          reader.result &&
+            onImageDrop({
+              fullImageSrc: reader.result as string,
+              name: `${uuidv4()}_${file?.name.replaceAll(" ", "_")}`,
+            });
         };
         reader.readAsDataURL(file);
       });
@@ -34,12 +36,16 @@ export const DragAndDrop = ({ onImageDrop }: DragAndDropProps) => {
     const onPaste = (event: ClipboardEvent) => {
       const item = event.clipboardData?.items[0];
       if (item?.type.indexOf("image") === 0) {
-        const blob = item.getAsFile();
+        const file = item.getAsFile();
         const reader = new FileReader();
         reader.onload = () => {
-          reader.result && onImageDrop(reader.result as string);
+          reader.result &&
+            onImageDrop({
+              fullImageSrc: reader.result as string,
+              name: `${uuidv4()}_${file?.name.replaceAll(" ", "_")}`,
+            });
         };
-        blob && reader.readAsDataURL(blob);
+        file && reader.readAsDataURL(file);
       }
     };
     document.addEventListener("paste", onPaste);
