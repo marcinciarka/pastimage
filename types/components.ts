@@ -6,3 +6,9 @@ export type DragAndDropProps = {
     name,
   }: Pick<ImageObjectType, "fullImageSrc" | "name">) => void;
 };
+
+export type LoginDialogProps = {
+  openLoginDialog: () => void;
+  closeLoginDialog: () => void;
+  loginDialogOpen: boolean;
+};

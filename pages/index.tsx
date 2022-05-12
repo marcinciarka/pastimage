@@ -1,10 +1,5 @@
 import type { NextPage } from "next";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
+import { Grid, Box, Tab, Tabs, ImageList, ImageListItem } from "@mui/material";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -18,6 +13,10 @@ import { ImageObjectType } from "types/api";
 import { DragAndDropProps } from "types/components";
 
 const MainPage: NextPage = () => {
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const openLoginDialog = () => setLoginDialogOpen(true);
+  const closeLoginDialog = () => setLoginDialogOpen(false);
+
   const [imagesList, setImageList] = useState<ImageObjectType[]>([]);
   const [currentTab, setCurrentTab] = useState<number>(1);
   const onUploadEnd = (uploadedImage: ImageObjectType) => {
@@ -55,7 +54,11 @@ const MainPage: NextPage = () => {
     <Container>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Header />
+          <Header
+            openLoginDialog={openLoginDialog}
+            closeLoginDialog={closeLoginDialog}
+            loginDialogOpen={loginDialogOpen}
+          />
         </Grid>
         <Grid item xs={12}>
           <DragAndDrop onImageDrop={updateImagesList} />

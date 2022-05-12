@@ -1,5 +1,5 @@
 import { FC, useEffect } from "react";
-import CircularProgress from "@mui/material/CircularProgress";
+import { CircularProgress } from "@mui/material";
 import { useTheme } from "@mui/system";
 import classNames from "classnames";
 import pastedImageStyles from "styles/components/pasted-image.module.scss";

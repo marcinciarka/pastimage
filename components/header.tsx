@@ -1,10 +1,16 @@
 import { FC } from "react";
 import DinnerDiningIcon from "@mui/icons-material/DinnerDining";
-import Typography from "@mui/material/Typography";
+import { Typography, Grid } from "@mui/material";
 import Head from "next/head";
 import { useTheme } from "@mui/system";
+import { LoginDialog } from "./login-dialog";
+import { LoginDialogProps } from "types/components";
 
-export const Header: FC = () => {
+export const Header: FC<LoginDialogProps> = ({
+  openLoginDialog,
+  closeLoginDialog,
+  loginDialogOpen,
+}) => {
   const {
     palette: { text },
   } = useTheme();
@@ -14,28 +20,35 @@ export const Header: FC = () => {
       <Head>
         <title>pastimage 🤌 🍝</title>
       </Head>
-      <Typography
-        variant="h4"
-        component="div"
-        gutterBottom
-        align="center"
-        color={text.primary}
-        sx={{
-          marginTop: 5,
-          marginBottom: 5,
-        }}
-      >
-        <DinnerDiningIcon
-          sx={{
-            fontSize: 45,
-            position: "relative",
-            marginBottom: -1,
-            overflow: "visible",
-            fill: text.primary,
-          }}
-        />
-        pastimage
-      </Typography>
+      {/* <Grid container spacing={2} alignContent="center"> */}
+      <Grid container spacing={2} marginY={1}>
+        <Grid item xs={6} alignSelf="center">
+          <Typography
+            variant="h4"
+            component="div"
+            gutterBottom
+            color={text.primary}
+          >
+            <DinnerDiningIcon
+              sx={{
+                fontSize: 45,
+                position: "relative",
+                marginBottom: -1,
+                overflow: "visible",
+                fill: text.primary,
+              }}
+            />
+            pastimage
+          </Typography>
+        </Grid>
+        <Grid item xs={6} alignSelf="center">
+          <LoginDialog
+            openLoginDialog={openLoginDialog}
+            closeLoginDialog={closeLoginDialog}
+            loginDialogOpen={loginDialogOpen}
+          />
+        </Grid>
+      </Grid>
     </>
   );
 };
