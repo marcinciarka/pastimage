@@ -2,16 +2,12 @@ import React, { useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { Typography } from "@mui/material";
-import { useTheme } from "@mui/system";
 import classNames from "classnames";
 import { v4 as uuidv4 } from "uuid";
 import dragAndDropStyles from "styles/components/drag-and-drop.module.scss";
 import { DragAndDropProps } from "types/components";
 
 export const DragAndDrop = ({ onImageDrop }: DragAndDropProps) => {
-  const {
-    palette: { text },
-  } = useTheme();
   const onDrop = useCallback(
     (acceptedFiles) => {
       acceptedFiles.forEach((file: File) => {
@@ -61,21 +57,12 @@ export const DragAndDrop = ({ onImageDrop }: DragAndDropProps) => {
           isDragActive && dragAndDropStyles.DragActive
         )}
       >
-        <ContentCopyIcon sx={{ fontSize: 60, fill: text.primary }} />
-        <Typography
-          variant="h5"
-          gutterBottom
-          component="div"
-          color={text.secondary}
-        >
+        <ContentCopyIcon sx={{ fontSize: 60 }} />
+        <Typography variant="h5" gutterBottom component="div">
           Przeciągnij plik na to pole
         </Typography>
-        <Typography variant="subtitle1" color={text.secondary}>
-          lub
-        </Typography>
-        <Typography variant="h5" color={text.secondary}>
-          wklej prosto ze schowka
-        </Typography>
+        <Typography variant="subtitle1">lub</Typography>
+        <Typography variant="h5">wklej prosto ze schowka</Typography>
       </div>
     </div>
   );

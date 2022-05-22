@@ -9,12 +9,38 @@ const client = ldap.createClient({
   url: process.env.LDAP_URI!,
 });
 
+const searchUser = (userUid: string) => {
+  const opts = {
+    attributes: ["cn"],
+  };
+  return new Promise<{ fullName?: string; error?: string }>(
+    (resolve, reject) => {
+      client.search(
+        `uid=${userUid},ou=Accounts,dc=softax,dc=local`,
+        opts,
+        (err, res) => {
+          res.on("searchEntry", (entry) => {
+            resolve({
+              fullName: entry.object.cn as string,
+            });
+          });
+          res.on("error", (err) => {
+            resolve({
+              error: err.message,
+            });
+          });
+        }
+      );
+    }
+  );
+};
+
 export default NextAuth({
   providers: [
     CredentialsProvider({
       name: "LDAP",
       credentials: {
-        username: {
+        login: {
           label: "DN",
           type: "text",
           placeholder: "",
@@ -25,23 +51,34 @@ export default NextAuth({
         },
       },
       async authorize(credentials, req) {
-        if (!credentials || !credentials.username || !credentials.password) {
+        if (!credentials || !credentials.login || !credentials.password) {
           throw new Error("Please fill login and password.");
         }
 
-        return new Promise((resolve, reject) => {
-          client.bind(credentials.username, credentials.password, (error) => {
-            if (error) {
-              console.error("Failed");
-              reject();
-            } else {
-              console.log("Logged in");
-              resolve({
-                username: credentials.username,
-                password: credentials.password,
-              });
+        return new Promise(async (resolve, reject) => {
+          client.bind(
+            // you might need to change the DN string here
+            `uid=${credentials.login},ou=Accounts,dc=softax,dc=local`,
+            credentials.password,
+            async (error) => {
+              const { fullName, error: searchError } = await searchUser(
+                credentials.login
+              );
+              if (error || searchError) {
+                console.error("Failed", searchError, error);
+                reject({
+                  error,
+                  searchError,
+                });
+              } else {
+                resolve({
+                  fullName,
+                  login: credentials.login,
+                  password: credentials.password,
+                });
+              }
             }
-          });
+          );
         });
       },
     }),
@@ -50,8 +87,9 @@ export default NextAuth({
     async jwt({ token, user }) {
       const isSignIn = user ? true : false;
       if (isSignIn) {
-        token.username = user.username;
-        token.password = user.password;
+        token.login = user?.login;
+        token.password = user?.password;
+        token.fullName = user?.fullName;
       }
       return token;
     },
@@ -59,15 +97,13 @@ export default NextAuth({
       return {
         ...session,
         user: {
-          username: token.username,
+          login: token.login,
+          fullName: token.fullName,
         },
       };
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-  pages: {
-    signIn: "/",
-  },
   jwt: {
     secret: process.env.JWT_SECRET,
   },

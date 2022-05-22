@@ -8,10 +8,6 @@ const lightTheme = createTheme({
     background: {
       default: 'transparent'
     },
-    text: {
-      primary: '#5e7581',
-      secondary: '#a1bcc9',
-    },
     primary: {
       main: '#7794a1',
     },
